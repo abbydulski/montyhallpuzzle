@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monty Hall Puzzle</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #111;
+      color: white;
+    }
+    .doors {
+      display: flex;
+      justify-content: center;
+      margin: 50px;
+    }
+    .door {
+      width: 100px;
+      height: 200px;
+      margin: 20px;
+      background: brown;
+      border: 5px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+    }
+    .hidden {
+      visibility: hidden;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pick a Door</h1>
+  <div class="doors">
+    <div class="door" id="door0">🚪</div>
+    <div class="door" id="door1">🚪</div>
+    <div class="door" id="door2">🚪</div>
+  </div>
+  <div id="message"></div>
+
+  <script>
+    const doors = [0, 1, 2];
+    const winningDoor = doors[Math.floor(Math.random() * 3)];
+    let firstChoice = null;
+    let revealedDoor = null;
+
+    doors.forEach(id => {
+      document.getElementById("door" + id).onclick = () => chooseDoor(id);
+    });
+
+    function chooseDoor(id) {
+      if (firstChoice !== null) return; // Prevent multiple clicks
+      firstChoice = id;
+
+      // Reveal one losing door that's not the choice or winner
+      revealedDoor = doors.find(d => d !== firstChoice && d !== winningDoor);
+      document.getElementById("door" + revealedDoor).classList.add("hidden");
+
+      document.getElementById("message").innerHTML = `
+        You chose Door ${firstChoice + 1}.<br>
+        We revealed a losing door. Do you want to stay or switch?<br>
+        <button onclick="stay()">Stay</button>
+        <button onclick="switchDoor()">Switch</button>
+      `;
+    }
+
+    function stay() {
+      window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Rick Roll
+    }
+
+    function switchDoor() {
+      const switchChoice = doors.find(d => d !== firstChoice && d !== revealedDoor);
+      if (switchChoice === winningDoor) {
+        window.location.href = "https://shv.com"; // Your real website
+      } else {
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Rick Roll
+      }
+    }
+  </script>
+</body>
+</html>
