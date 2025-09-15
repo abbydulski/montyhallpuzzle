@@ -16,21 +16,25 @@
       margin: 50px;
     }
     .door {
-      width: 100px;
+      width: 120px;
       height: 200px;
       margin: 20px;
-      background: brown;
+      background: linear-gradient(to right, #8b4513, #5c3317);
       border: 5px solid #333;
-      border-radius: 10px;
+      border-radius: 5px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 40px;
       color: white;
+      perspective: 1000px;
+      transition: transform 1s ease-in-out;
+      transform-origin: left center;
     }
-    .hidden {
-      visibility: hidden;
+    .door.open {
+      transform: rotateY(-100deg);
+      cursor: default;
     }
     #message {
       margin-top: 20px;
@@ -41,6 +45,13 @@
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #444;
+      color: white;
+    }
+    button:hover {
+      background: #666;
     }
   </style>
 </head>
@@ -69,11 +80,11 @@
 
       // Reveal one losing door that's not the choice or winner
       revealedDoor = doors.find(d => d !== firstChoice && d !== winningDoor);
-      document.getElementById("door" + revealedDoor).classList.add("hidden");
+      document.getElementById("door" + revealedDoor).classList.add("open");
 
       document.getElementById("message").innerHTML = `
         You chose Door ${firstChoice + 1}.<br>
-        We revealed a losing door. Do you want to stay or switch?<br>
+        We opened a losing door. Do you want to stay or switch?<br>
         <button onclick="stay()">Stay</button>
         <button onclick="switchDoor()">Switch</button>
       `;
