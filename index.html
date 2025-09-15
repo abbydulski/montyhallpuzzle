@@ -1,312 +1,125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Monty Hall — Pick a Door</title>
-<style>
-  :root{
-    --door-w: 140px;
-    --door-h: 220px;
-    --bg: #0f1720;
-    --muted: #97a0aa;
-  }
-  html,body{height:100%;margin:0;}
-  body{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: linear-gradient(180deg,#071021 0%, #0f2430 100%);
-    color:#f7fafc;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    -webkit-font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
-    padding:28px;
-  }
-
-  .card{
-    width: min(920px, 96vw);
-    padding:28px;
-    border-radius:12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-    text-align:center;
-  }
-
-  h1{ margin:0 0 12px 0; font-size:22px; }
-  p.lead{ margin:0 0 18px 0; color:var(--muted); }
-
-  .doors {
-    display:flex;
-    justify-content:center;
-    gap:28px;
-    margin: 8px 0 18px 0;
-  }
-
-  /* Each .door is a 3D stage (perspective) containing a rotating panel and a revealed content behind it */
-  .door {
-    width:var(--door-w);
-    height:var(--door-h);
-    position:relative;
-    perspective:1200px;                 /* perspective on each door so rotation aligns with that door */
-    cursor:pointer;
-    user-select:none;
-  }
-
-  /* the visible 'door panel' that rotates */
-  .panel{
-    position:absolute;
-    inset:0;
-    border-radius:10px;
-    background: linear-gradient(180deg, #8b4b1f 0%, #5b2f17 100%);
-    box-shadow: 0 6px 18px rgba(8,10,12,0.6), inset 0 -10px 30px rgba(0,0,0,0.25);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:44px;
-    color: #fff;
-    transform-style: preserve-3d;
-    transition: transform 900ms cubic-bezier(.2,.85,.2,1);
-    z-index:3;
-    /* default hinge on left; overridden for hinge-right via .hinge-right on .door */
-    transform-origin: left center;
-  }
-
-  /* set transform-origin on hinge-right doors */
-  .door.hinge-right .panel { transform-origin: right center; }
-
-  /* open rotations (sign and degree differ by hinge side) */
-  .door.hinge-left .panel.open  { transform: rotateY(-100deg); }
-  .door.hinge-right .panel.open { transform: rotateY(100deg);  }
-
-  /* the revealed content behind the door */
-  .content {
-    position:absolute;
-    inset:0;
-    border-radius:10px;
-    background: linear-gradient(180deg,#fff,#f3f4f6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:28px;
-    color:#0b1220;
-    z-index:1;
-    box-shadow: 0 4px 12px rgba(2,6,23,0.25);
-    padding:8px;
-  }
-
-  /* subtle door number pill */
-  .num {
-    position:absolute;
-    top:10px;
-    left:10px;
-    background: rgba(0,0,0,0.25);
-    color:#fff;
-    padding:4px 8px;
-    border-radius:999px;
-    font-size:13px;
-    z-index:4;
-  }
-
-  #message{
-    min-height:48px;
-    color:var(--muted);
-    font-size:15px;
-    margin-top:6px;
-  }
-
-  .controls{
-    margin-top:12px;
-  }
-  button {
-    -webkit-appearance:none;
-    appearance:none;
-    background:#1f2937;
-    border:none;
-    color:#fff;
-    padding:10px 14px;
-    border-radius:8px;
-    margin:0 8px;
-    font-size:14px;
-    cursor:pointer;
-    transition: transform .12s ease, background .12s ease;
-  }
-  button:active{ transform:translateY(1px); }
-  button.secondary{ background:#0b1220; color:var(--muted); border:1px solid rgba(255,255,255,0.03); }
-  button[disabled]{ opacity:0.45; cursor:not-allowed; transform:none; }
-
-  /* responsive shrink */
-  @media (max-width:520px){
-    .doors{ gap:12px; }
-    :root{ --door-w: 96px; --door-h: 170px; }
-    .panel{ font-size:34px; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Puzzle</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #111;
+      color: white;
+    }
+    .doors {
+      display: flex;
+      justify-content: center;
+      margin: 50px;
+    }
+    .door {
+      width: 120px;
+      height: 200px;
+      margin: 20px;
+      background: linear-gradient(to right, #8b4513, #5c3317);
+      border: 5px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      perspective: 1000px;
+    }
+    .panel {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 1s ease-in-out;
+      transform-origin: left center;
+      background: inherit;
+      border-radius: inherit;
+    }
+    .door.open .panel {
+      transform: rotateY(-100deg);
+      cursor: default;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #444;
+      color: white;
+    }
+    button:hover {
+      background: #666;
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Monty Hall — Pick a door</h1>
-    <p class="lead">Click any door. One other door will be opened as empty. Then decide: stay or switch.</p>
-
-    <div class="doors" id="doors">
-      <div class="door" data-index="0" aria-label="Door 1" role="button" tabindex="0">
-        <div class="num">1</div>
-        <div class="panel">🚪</div>
-        <div class="content" aria-hidden="true"></div>
-      </div>
-      <div class="door" data-index="1" aria-label="Door 2" role="button" tabindex="0">
-        <div class="num">2</div>
-        <div class="panel">🚪</div>
-        <div class="content" aria-hidden="true"></div>
-      </div>
-      <div class="door" data-index="2" aria-label="Door 3" role="button" tabindex="0">
-        <div class="num">3</div>
-        <div class="panel">🚪</div>
-        <div class="content" aria-hidden="true"></div>
-      </div>
-    </div>
-
-    <div id="message">Pick a door to start.</div>
-    <div class="controls" id="controls" style="display:none;">
-      <button id="stayBtn" class="secondary">Stay</button>
-      <button id="switchBtn">Switch</button>
-    </div>
+  <div class="doors">
+    <div class="door" id="door0"><div class="panel">🚪</div></div>
+    <div class="door" id="door1"><div class="panel">🚪</div></div>
+    <div class="door" id="door2"><div class="panel">🚪</div></div>
   </div>
+  <div id="message">Pick a door.</div>
 
-<script>
-/*
-  Behavior implemented per your spec:
-    - User clicks a door (first choice).
-    - Monty opens one of the other doors (animated).
-    - User chooses Stay or Switch.
-    - Stay -> final chosen door opens then RickRoll.
-    - Switch -> the other unopened door opens then redirect to https://shv.com
-*/
+  <script>
+    const doors = [0, 1, 2];
+    const winningDoor = doors[Math.floor(Math.random() * 3)];
+    let firstChoice = null;
+    let revealedDoor = null;
 
-const doors = Array.from(document.querySelectorAll('.door'));
-const message = document.getElementById('message');
-const controls = document.getElementById('controls');
-const stayBtn = document.getElementById('stayBtn');
-const switchBtn = document.getElementById('switchBtn');
+    doors.forEach(id => {
+      document.getElementById("door" + id).onclick = () => chooseDoor(id);
+    });
 
-// URLs — change shvUrl if you host elsewhere
-const shvUrl = 'https://shv.com';
-const rickUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    function chooseDoor(id) {
+      if (firstChoice !== null) return; // Prevent multiple clicks
+      firstChoice = id;
 
-let firstChoice = null;
-let revealedDoor = null;
-let state = 'idle'; // idle -> chosen -> postReveal -> finished
+      // Reveal one losing door that's not the choice or winner
+      revealedDoor = doors.find(d => d !== firstChoice && d !== winningDoor);
+      document.getElementById("door" + revealedDoor).classList.add("open");
 
-// Accessibility: allow Enter/Space to select doors
-doors.forEach((d, i) => {
-  d.addEventListener('click', () => onFirstPick(i));
-  d.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter' || ev.key === ' ') {
-      ev.preventDefault();
-      onFirstPick(i);
+      document.getElementById("message").innerHTML = `
+        You chose Door ${firstChoice + 1}.<br>
+        We opened a losing door. Do you want to stay or switch?<br>
+        <button onclick="stay()">Stay</button>
+        <button onclick="switchDoor()">Switch</button>
+      `;
     }
-  });
-});
 
-function onFirstPick(index){
-  if (state !== 'idle') return;
-  state = 'chosen';
-  firstChoice = index;
-  message.textContent = `You chose Door ${index + 1}. Monty will open an empty door...`;
-  // pick a door to reveal (one of the other two). We purposely use a random non-chosen door; Monty should always pick an empty door.
-  const others = [0,1,2].filter(i => i !== firstChoice);
-  // choose one at random to open (we don't maintain a hidden 'winning door' here because you asked to map Switch->site, Stay->rickroll deterministically)
-  revealedDoor = others[Math.floor(Math.random() * others.length)];
-  // set the revealed door's content to 'empty' and animate it open
-  setDoorContent(revealedDoor, 'EMPTY', 'Nothing here');
-  setHinge(revealedDoor);
-  animateOpen(revealedDoor, () => {
-    // after Monty opens one door, show stay/switch controls
-    message.textContent = `One door is opened and empty. Do you want to stay or switch?`;
-    controls.style.display = 'block';
-    stayBtn.disabled = false;
-    switchBtn.disabled = false;
-    state = 'postReveal';
-  });
-}
+    function stay() {
+      finalOpen(firstChoice, "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    }
 
-function setHinge(index){
-  const d = doors[index];
-  d.classList.remove('hinge-left','hinge-right');
-  // choose hinge so door visually swings outward away from center:
-  // left-most door (0) hinges left, right-most (2) hinges right, middle (1) hinge-right (so it opens toward right)
-  if (index === 2) d.classList.add('hinge-right');
-  else d.classList.add('hinge-left');
-}
+    function switchDoor() {
+      const switchChoice = doors.find(d => d !== firstChoice && d !== revealedDoor);
+      finalOpen(switchChoice, "https://shv.com");
+    }
 
-function setDoorContent(index, type, label){
-  // type can be 'EMPTY' | 'WIN' | 'LOSE' ; label is small text shown behind
-  const content = doors[index].querySelector('.content');
-  if (type === 'EMPTY') content.innerHTML = `<div style="text-align:center;"><div style="font-size:28px;">🐐</div><div style="font-size:13px;color:#334155;margin-top:6px;">${label}</div></div>`;
-  else if (type === 'WIN') content.innerHTML = `<div style="text-align:center;"><div style="font-size:30px;">🌐</div><div style="font-size:13px;color:#334155;margin-top:6px;">You win!</div></div>`;
-  else if (type === 'LOSE') content.innerHTML = `<div style="text-align:center;"><div style="font-size:28px;">❌</div><div style="font-size:13px;color:#334155;margin-top:6px;">Try again</div></div>`;
-}
-
-// animateOpen: add .open to the door's .panel and call cb after transition completes
-function animateOpen(index, cb){
-  const door = doors[index];
-  const panel = door.querySelector('.panel');
-
-  // ensure hinge class exists
-  if (!door.classList.contains('hinge-left') && !door.classList.contains('hinge-right')) setHinge(index);
-
-  // disable pointer events while animating
-  doors.forEach(d => d.style.pointerEvents = 'none');
-
-  // add open class (this triggers the CSS rotation)
-  // give a micro delay to ensure repaint and a clean transition
-  requestAnimationFrame(() => {
-    panel.classList.add('open');
-  });
-
-  // wait for transitionend
-  const onEnd = (ev) => {
-    if (ev.propertyName && ev.propertyName !== 'transform') return; // ignore unrelated transitions
-    panel.removeEventListener('transitionend', onEnd);
-    // allow a tiny pause for the user to see the open door before continuing
-    setTimeout(() => {
-      doors.forEach(d => d.style.pointerEvents = 'auto');
-      if (cb) cb();
-    }, 180);
-  };
-  panel.addEventListener('transitionend', onEnd);
-}
-
-// handle Stay / Switch
-stayBtn.addEventListener('click', () => {
-  if (state !== 'postReveal') return;
-  state = 'finished';
-  stayBtn.disabled = true;
-  switchBtn.disabled = true;
-  message.textContent = `You stayed. Opening your door...`;
-  // prepare content for the final opened door (lose)
-  setDoorContent(firstChoice, 'LOSE', 'Better luck next time');
-  setHinge(firstChoice);
-  animateOpen(firstChoice, () => {
-    // short delay so the user sees the opened result, then redirect
-    setTimeout(() => { window.location.href = rickUrl; }, 700);
-  });
-});
-
-switchBtn.addEventListener('click', () => {
-  if (state !== 'postReveal') return;
-  state = 'finished';
-  stayBtn.disabled = true;
-  switchBtn.disabled = true;
-  const switchChoice = [0,1,2].find(i => i !== firstChoice && i !== revealedDoor);
-  message.textContent = `You switched. Opening the other door...`;
-  // prepare content for the final opened door (win)
-  setDoorContent(switchChoice, 'WIN', 'Winner!');
-  setHinge(switchChoice);
-  animateOpen(switchChoice, () => {
-    setTimeout(() => { window.location.href = shvUrl; }, 700);
-  });
-});
-</script>
+    function finalOpen(doorIndex, redirectUrl) {
+      const door = document.getElementById("door" + doorIndex);
+      const panel = door.querySelector(".panel");
+      // Reset in case it's already open
+      panel.classList.remove("open");
+      // Animate open
+      setTimeout(() => {
+        door.classList.add("open");
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000); // delay so animation finishes
+      }, 50);
+    }
+  </script>
 </body>
 </html>
