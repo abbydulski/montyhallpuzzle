@@ -2,123 +2,175 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Puzzle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick a Door</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      background: #111;
-      color: white;
-    }
-    .doors {
+      background: #f4f4f9;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
-      margin: 50px;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
     }
+
+    h1 {
+      margin-bottom: 40px;
+      font-size: 2rem;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .doors {
+      display: flex;
+      gap: 40px;
+    }
+
+    .door-container {
+      perspective: 1000px;
+      position: relative;
+    }
+
     .door {
       width: 120px;
       height: 200px;
-      margin: 20px;
-      background: linear-gradient(to right, #8b4513, #5c3317);
-      border: 5px solid #333;
-      border-radius: 5px;
+      background: sienna;
+      border: 4px solid #5a2d0c;
+      border-radius: 6px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      color: white;
-      perspective: 1000px;
-    }
-    .panel {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      transform-origin: left;
       transition: transform 1s ease-in-out;
-      transform-origin: left center;
-      background: inherit;
-      border-radius: inherit;
+      position: relative;
+      z-index: 2;
     }
-    .door.open .panel {
+
+    .door.open {
       transform: rotateY(-100deg);
-      cursor: default;
     }
-    #message {
-      margin-top: 20px;
-      font-size: 20px;
+
+    .behind {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 120px;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      background: #fff;
+      border-radius: 6px;
+      border: 2px solid #ccc;
+      z-index: 1;
     }
+
+    .message {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      color: #444;
+      min-height: 1.5em;
+      text-align: center;
+    }
+
     button {
-      margin: 10px;
+      margin-top: 20px;
       padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
+      font-size: 1rem;
       border: none;
-      border-radius: 5px;
-      background: #444;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #4CAF50;
       color: white;
+      transition: background 0.3s;
     }
+
     button:hover {
-      background: #666;
+      background: #45a049;
     }
   </style>
 </head>
 <body>
+  <h1>Pick a Door</h1>
   <div class="doors">
-    <div class="door" id="door0"><div class="panel">🚪</div></div>
-    <div class="door" id="door1"><div class="panel">🚪</div></div>
-    <div class="door" id="door2"><div class="panel">🚪</div></div>
+    <div class="door-container" data-index="0">
+      <div class="door"></div>
+      <div class="behind"></div>
+    </div>
+    <div class="door-container" data-index="1">
+      <div class="door"></div>
+      <div class="behind"></div>
+    </div>
+    <div class="door-container" data-index="2">
+      <div class="door"></div>
+      <div class="behind"></div>
+    </div>
   </div>
-  <div id="message">Pick a door.</div>
+  <div class="message"></div>
+  <button id="switchBtn" style="display:none;">Switch</button>
+  <button id="stayBtn" style="display:none;">Stay</button>
 
   <script>
-    const doors = [0, 1, 2];
-    const winningDoor = doors[Math.floor(Math.random() * 3)];
+    const doors = document.querySelectorAll('.door-container');
+    const message = document.querySelector('.message');
+    const switchBtn = document.getElementById('switchBtn');
+    const stayBtn = document.getElementById('stayBtn');
+
+    const winningDoor = Math.floor(Math.random() * 3);
     let firstChoice = null;
     let revealedDoor = null;
 
-    doors.forEach(id => {
-      document.getElementById("door" + id).onclick = () => chooseDoor(id);
+    doors.forEach((door, index) => {
+      door.addEventListener('click', () => {
+        if (firstChoice === null) {
+          firstChoice = index;
+
+          // reveal a goat door that's not the winning door and not chosen
+          do {
+            revealedDoor = Math.floor(Math.random() * 3);
+          } while (revealedDoor === winningDoor || revealedDoor === firstChoice);
+
+          doors[revealedDoor].querySelector('.door').classList.add('open');
+          doors[revealedDoor].querySelector('.behind').textContent = "🐐";
+
+          message.textContent = "One door has been revealed. Do you want to switch or stay?";
+          switchBtn.style.display = "inline-block";
+          stayBtn.style.display = "inline-block";
+        }
+      });
     });
 
-    function chooseDoor(id) {
-      if (firstChoice !== null) return; // Prevent multiple clicks
-      firstChoice = id;
+    switchBtn.addEventListener('click', () => {
+      const switchedChoice = [0,1,2].find(i => i !== firstChoice && i !== revealedDoor);
+      revealOutcome(switchedChoice);
+    });
 
-      // Reveal one losing door that's not the choice or winner
-      revealedDoor = doors.find(d => d !== firstChoice && d !== winningDoor);
-      document.getElementById("door" + revealedDoor).classList.add("open");
+    stayBtn.addEventListener('click', () => {
+      revealOutcome(firstChoice);
+    });
 
-      document.getElementById("message").innerHTML = `
-        You chose Door ${firstChoice + 1}.<br>
-        We opened a losing door. Do you want to stay or switch?<br>
-        <button onclick="stay()">Stay</button>
-        <button onclick="switchDoor()">Switch</button>
-      `;
-    }
-
-    function stay() {
-      finalOpen(firstChoice, "https://en.wikipedia.org/wiki/Monty_Hall_problem");
-    }
-
-    function switchDoor() {
-      const switchChoice = doors.find(d => d !== firstChoice && d !== revealedDoor);
-      finalOpen(switchChoice, "https://shv.com");
-    }
-
-    function finalOpen(doorIndex, redirectUrl) {
-      const door = document.getElementById("door" + doorIndex);
-      const panel = door.querySelector(".panel");
-      // Reset in case it's already open
-      panel.classList.remove("open");
-      // Animate open
-      setTimeout(() => {
-        door.classList.add("open");
+    function revealOutcome(choice) {
+      if (choice === winningDoor) {
+        // open winning door with prize
+        doors[choice].querySelector('.door').classList.add('open');
+        doors[choice].querySelector('.behind').textContent = "🎉";
         setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 1000); // delay so animation finishes
-      }, 50);
+          window.location.href = "https://shv.com"; // your site
+        }, 1500);
+      } else {
+        // open chosen door and rickroll
+        doors[choice].querySelector('.door').classList.add('open');
+        doors[choice].querySelector('.behind').textContent = "🐐";
+        setTimeout(() => {
+          window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
+        }, 1500);
+      }
+
+      switchBtn.style.display = "none";
+      stayBtn.style.display = "none";
+      message.textContent = "";
     }
   </script>
 </body>
