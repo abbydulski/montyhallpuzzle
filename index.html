@@ -179,15 +179,15 @@
     function revealOutcome(choice) {
       if (choice === winningDoor) {
         doors[choice].querySelector('.door').classList.add('open');
-        doors[choice].querySelector('.behind').textContent = "🎉";
-        setTimeout(() => {
-          window.location.href = "https://shv.com"; // your site
-        }, 1500);
-      } else {
-        doors[choice].querySelector('.door').classList.add('open');
         doors[choice].querySelector('.behind').textContent = "🐐";
         setTimeout(() => {
           window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
+        }, 1500);
+      } else {
+        doors[choice].querySelector('.door').classList.add('open');
+        doors[choice].querySelector('.behind').textContent = "🎉";
+        setTimeout(() => {
+          window.location.href = "https://shv.com"; // your site
         }, 1500);
       }
 
