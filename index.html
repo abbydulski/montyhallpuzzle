@@ -1,202 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pick a Door</title>
   <style>
-    body {
+    body{
       background: #f4f4f9;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      min-height:100vh;
+      margin:0;
+      padding:20px;
+      box-sizing:border-box;
+      color:#333;
     }
-
-    h1 {
-      margin-bottom: 30px;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      color: #333;
-      font-weight: 500;
-      text-align: center;
+    h1{ margin:0 0 18px 0; font-size:clamp(1.4rem, 4vw, 2rem); }
+    .doors{
+      display:flex;
+      justify-content:center;
+      gap:5vw;
+      flex-wrap:nowrap;    /* always 3 across; they scale using vw */
+      width:100%;
+      max-width:900px;
     }
-
-    .doors {
-      display: flex;
-      justify-content: center;
-      gap: 5vw;
-      margin-bottom: 20px;
-      flex-wrap: nowrap; /* desktop default */
+    .door-container{
+      perspective:1000px;
+      position:relative;
+      flex: 0 0 25vw;
+      max-width:150px;
+      min-width:84px;
     }
-
-    .door-container {
-      perspective: 1000px;
-      position: relative;
-      flex: 1 1 auto;
-      max-width: 150px;
-      min-width: 90px;
-    }
-
-    .door {
-      width: 100%;
-      aspect-ratio: 3/5;
+    .door{
+      width:100%;
+      aspect-ratio:3/5;
       background: sienna;
-      border: 4px solid #5a2d0c;
-      border-radius: 6px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-      cursor: pointer;
-      transform-origin: left;
-      transition: transform 1s ease-in-out;
-      position: relative;
-      z-index: 2;
+      border:4px solid #5a2d0c;
+      border-radius:6px;
+      box-shadow:0 6px 12px rgba(0,0,0,0.12);
+      cursor:pointer;
+      transform-origin:left;
+      transition: transform 700ms cubic-bezier(.2,.85,.2,1);
+      position:relative;
+      z-index:3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: clamp(28px,6vw,44px);
+      color: #fff;
+      user-select:none;
     }
-
-    .door.open {
-      transform: rotateY(-100deg);
+    .door.open{ transform: rotateY(-100deg); cursor:default; }
+    /* when hinge-right is needed it can rotate other way; keep left for simplicity */
+    .behind{
+      position:absolute;
+      inset:0;
+      border-radius:6px;
+      background:#fff;
+      border:2px solid #e0e0e0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: clamp(28px,6vw,44px);
+      color:#111;
+      z-index:1;
+      transform: scale(.99);
+      opacity:0;                   /* hidden until panel opens */
+      transition: opacity 220ms ease, transform 220ms ease;
+      pointer-events:none;
     }
+    /* reveal the behind when the door has class "open" */
+    .door.open + .behind { opacity:1; transform: scale(1); }
 
-    .behind {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: clamp(1.5rem, 6vw, 2.5rem);
-      background: #fff;
-      border-radius: 6px;
-      border: 2px solid #ccc;
-      z-index: 1;
+    .message{ margin-top:18px; color:#666; min-height:1.2em; text-align:center; max-width:90%; }
+    .controls{ margin-top:12px; display:flex; gap:12px; justify-content:center; }
+    button{
+      background:#4CAF50; color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer;
+      font-size:14px;
     }
-
-    .message {
-      margin-top: 10px;
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      color: #444;
-      min-height: 1.5em;
-      text-align: center;
-      max-width: 90%;
-    }
-
-    button {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #4CAF50;
-      color: white;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #45a049;
-    }
-
-    /* Mobile: stack vertically */
-    @media (max-width: 600px) {
-      .doors {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-
-      .door-container {
-        max-width: 40vw;
-      }
+    button.secondary{ background:#fff; color:#444; border:1px solid #ddd; }
+    button[disabled]{ opacity:.45; cursor:not-allowed; }
+    @media (max-width:380px){
+      .doors{ gap:10px; overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
     }
   </style>
 </head>
 <body>
   <h1>Pick a Door</h1>
-  <div class="doors">
-    <div class="door-container" data-index="0">
-      <div class="door"></div>
-      <div class="behind"></div>
+  <div class="doors" id="doors">
+    <div class="door-container" data-index="0" tabindex="0" role="button" aria-label="Door 1">
+      <div class="door">🚪</div>
+      <div class="behind" aria-hidden="true"></div>
     </div>
-    <div class="door-container" data-index="1">
-      <div class="door"></div>
-      <div class="behind"></div>
+    <div class="door-container" data-index="1" tabindex="0" role="button" aria-label="Door 2">
+      <div class="door">🚪</div>
+      <div class="behind" aria-hidden="true"></div>
     </div>
-    <div class="door-container" data-index="2">
-      <div class="door"></div>
-      <div class="behind"></div>
+    <div class="door-container" data-index="2" tabindex="0" role="button" aria-label="Door 3">
+      <div class="door">🚪</div>
+      <div class="behind" aria-hidden="true"></div>
     </div>
   </div>
-  <div class="message"></div>
-  <div>
-    <button id="switchBtn" style="display:none;">Switch</button>
-    <button id="stayBtn" style="display:none;">Stay</button>
+
+  <div id="message" class="message">Make your first pick.</div>
+  <div class="controls" id="controls" style="display:none;">
+    <button id="stayBtn" class="secondary">Stay</button>
+    <button id="switchBtn">Switch</button>
   </div>
 
-  <script>
-    const doors = document.querySelectorAll('.door-container');
-    const message = document.querySelector('.message');
-    const switchBtn = document.getElementById('switchBtn');
-    const stayBtn = document.getElementById('stayBtn');
+<script>
+  // URLs
+  const WIN_URL = "https://shv.com";
+  const LOSE_URL = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
 
-    const winningDoor = Math.floor(Math.random() * 3);
-    let firstChoice = null;
-    let revealedDoor = null;
+  // elements
+  const containers = Array.from(document.querySelectorAll('.door-container'));
+  const panels = containers.map(c => c.querySelector('.door'));
+  const behinds = containers.map(c => c.querySelector('.behind'));
+  const message = document.getElementById('message');
+  const controls = document.getElementById('controls');
+  const stayBtn = document.getElementById('stayBtn');
+  const switchBtn = document.getElementById('switchBtn');
 
-    doors.forEach((door, index) => {
-      door.addEventListener('click', () => {
-        if (firstChoice === null) {
-          firstChoice = index;
+  // internal state
+  let firstChoice = null;
+  let revealedDoor = null;
+  let busy = false;
 
-          // reveal a goat door that's not the winning door and not chosen
-          do {
-            revealedDoor = Math.floor(Math.random() * 3);
-          } while (revealedDoor === winningDoor || revealedDoor === firstChoice);
+  // pick a random prize door for demo purposes (not used to decide final redirect — switch/stay mapping is deterministic)
+  const prizeDoor = Math.floor(Math.random() * 3);
 
-          doors[revealedDoor].querySelector('.door').classList.add('open');
-          doors[revealedDoor].querySelector('.behind').textContent = "🐐";
+  // set simple hinge choices for nicer rotation on left/right doors (optional)
+  containers.forEach((c,i) => {
+    if(i === 2) c.querySelector('.door').style.transformOrigin = 'right center';
+  });
 
-          message.textContent = "One door has been revealed. Do you want to switch or stay?";
-          switchBtn.style.display = "inline-block";
-          stayBtn.style.display = "inline-block";
-        }
-      });
+  // make doors clickable & keyboard accessible
+  containers.forEach((container, i) => {
+    const choose = () => handleFirstPick(i);
+    container.addEventListener('click', choose);
+    container.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); }
     });
+  });
 
-    switchBtn.addEventListener('click', () => {
-      const switchedChoice = [0,1,2].find(i => i !== firstChoice && i !== revealedDoor);
-      revealOutcome(switchedChoice);
+  function handleFirstPick(index){
+    if (busy || firstChoice !== null) return;
+    busy = true;
+    firstChoice = index;
+    message.textContent = `You chose Door ${index + 1}. Opening an empty door...`;
+
+    // choose a door to reveal that's neither the player's pick nor (preferably) the prize.
+    // We still avoid revealing the prize door if possible for presentation.
+    let candidates = [0,1,2].filter(i => i !== firstChoice && i !== prizeDoor);
+    // if candidate list is empty (player picked the prize), reveal any other door at random
+    if (candidates.length === 0) candidates = [0,1,2].filter(i => i !== firstChoice);
+    revealedDoor = candidates[Math.floor(Math.random() * candidates.length)];
+
+    // show goat behind revealedDoor and animate open
+    behinds[revealedDoor].textContent = '🐐';
+    panels[revealedDoor].classList.add('open');
+
+    // after panel transition ends, show controls
+    panels[revealedDoor].addEventListener('transitionend', function onEnd(ev){
+      if (ev.propertyName && ev.propertyName !== 'transform') return;
+      panels[revealedDoor].removeEventListener('transitionend', onEnd);
+      setTimeout(() => {
+        message.textContent = 'One door is open and empty. Do you want to stay or switch?';
+        controls.style.display = 'flex';
+        busy = false;
+      }, 150);
     });
-
-    stayBtn.addEventListener('click', () => {
-      revealOutcome(firstChoice);
-    });
-
-    function revealOutcome(choice) {
-  if (choice === winningDoor) {
-    // WIN
-    doors[choice].querySelector('.door').classList.add('open');
-    doors[choice].querySelector('.behind').textContent = "🎉";
-    setTimeout(() => {
-      window.location.href = "https://shv.com"; // your site
-    }, 1500);
-  } else {
-    // LOSS
-    doors[choice].querySelector('.door').classList.add('open');
-    doors[choice].querySelector('.behind').textContent = "🐐";
-    setTimeout(() => {
-      window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
-    }, 1500);
   }
 
-  switchBtn.style.display = "none";
-  stayBtn.style.display = "none";
-  message.textContent = "";
-    }
-  </script>
+  // NOTE: deterministic mapping per your request:
+  //  - If the user SWITCHES -> always treat that as a WIN (show 🎉, then go to WIN_URL)
+  //  - If the user STAYS -> always treat that as a LOSS (show 🐐, then go to LOSE_URL)
+
+  switchBtn.addEventListener('click', () => {
+    if (busy || firstChoice === null) return;
+    busy = true;
+    controls.style.display = 'none';
+    // the "other" unopened door
+    const other = [0,1,2].find(i => i !== firstChoice && i !== revealedDoor);
+    message.textContent = 'You switched. Opening the other door...';
+
+    // show celebratory icon and open it, then redirect to shv.com
+    behinds[other].textContent = '🎉';
+    panels[other].classList.add('open');
+
+    panels[other].addEventListener('transitionend', function onEnd(ev){
+      if (ev.propertyName && ev.propertyName !== 'transform') return;
+      panels[other].removeEventListener('transitionend', onEnd);
+      setTimeout(() => window.location.href = WIN_URL, 650);
+    });
+
+    // fallback if transition doesn't fire
+    setTimeout(() => { if (busy) window.location.href = WIN_URL; }, 2200);
+  });
+
+  stayBtn.addEventListener('click', () => {
+    if (busy || firstChoice === null) return;
+    busy = true;
+    controls.style.display = 'none';
+    message.textContent = 'You stayed. Opening your door...';
+
+    // show goat and open the player's chosen door, then go to Monty Hall wiki
+    behinds[firstChoice].textContent = '🐐';
+    panels[firstChoice].classList.add('open');
+
+    panels[firstChoice].addEventListener('transitionend', function onEnd(ev){
+      if (ev.propertyName && ev.propertyName !== 'transform') return;
+      panels[firstChoice].removeEventListener('transitionend', onEnd);
+      setTimeout(() => window.location.href = LOSE_URL, 650);
+    });
+
+    // fallback
+    setTimeout(() => { if (busy) window.location.href = LOSE_URL; }, 2200);
+  });
+</script>
 </body>
 </html>
