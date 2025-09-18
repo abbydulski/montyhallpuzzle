@@ -177,23 +177,25 @@
     });
 
     function revealOutcome(choice) {
-      if (choice === winningDoor) {
-        doors[choice].querySelector('.door').classList.add('open');
-        doors[choice].querySelector('.behind').textContent = "🐐";
-        setTimeout(() => {
-          window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
-        }, 1500);
-      } else {
-        doors[choice].querySelector('.door').classList.add('open');
-        doors[choice].querySelector('.behind').textContent = "🎉";
-        setTimeout(() => {
-          window.location.href = "https://shv.com"; // your site
-        }, 1500);
-      }
+  if (choice === winningDoor) {
+    // WIN
+    doors[choice].querySelector('.door').classList.add('open');
+    doors[choice].querySelector('.behind').textContent = "🎉";
+    setTimeout(() => {
+      window.location.href = "https://shv.com"; // your site
+    }, 1500);
+  } else {
+    // LOSS
+    doors[choice].querySelector('.door').classList.add('open');
+    doors[choice].querySelector('.behind').textContent = "🐐";
+    setTimeout(() => {
+      window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
+    }, 1500);
+  }
 
-      switchBtn.style.display = "none";
-      stayBtn.style.display = "none";
-      message.textContent = "";
+  switchBtn.style.display = "none";
+  stayBtn.style.display = "none";
+  message.textContent = "";
     }
   </script>
 </body>
