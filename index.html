@@ -28,16 +28,16 @@
 
     .doors {
       display: flex;
-      gap: 5vw;
-      flex-wrap: wrap;
       justify-content: center;
+      gap: 5vw;
       margin-bottom: 20px;
+      flex-wrap: nowrap; /* desktop default */
     }
 
     .door-container {
       perspective: 1000px;
       position: relative;
-      flex: 1 1 25%;
+      flex: 1 1 auto;
       max-width: 150px;
       min-width: 90px;
     }
@@ -99,6 +99,19 @@
 
     button:hover {
       background: #45a049;
+    }
+
+    /* Mobile: stack vertically */
+    @media (max-width: 600px) {
+      .doors {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .door-container {
+        max-width: 40vw;
+      }
     }
   </style>
 </head>
@@ -174,7 +187,7 @@
         doors[choice].querySelector('.door').classList.add('open');
         doors[choice].querySelector('.behind').textContent = "🐐";
         setTimeout(() => {
-          window.location.href = "https://en.wikipedia.org/wiki/Monty_Hall_problem";
+          window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         }, 1500);
       }
 
